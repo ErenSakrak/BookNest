@@ -1,6 +1,9 @@
 ﻿using BookNest.Domain.Entities;
 using BookNest.Infrastructure.Data;
+using BookNest.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookNest.Web.Controllers
 {
@@ -13,31 +16,51 @@ namespace BookNest.Web.Controllers
         }
         public IActionResult Index()
         {
-            var villaNumbers = _db.VillaNumbers.ToList();
+            var villaNumbers = _db.VillaNumbers.Include(u=>u.Villa).ToList();
             return View(villaNumbers);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            VillaNumberVM villaNumberVM = new()
+            {
+                VillaList = _db.Villas.ToList().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString(),
+
+                })
+            };
+            return View(villaNumberVM);
         }
 
         [HttpPost]
-        public IActionResult Create(Villa obj)
+        public IActionResult Create(VillaNumberVM obj)
         {
-            if (obj.Name == obj.Description)
+            //ModelState.Remove("Villa");
+
+            bool roomNumberExists = _db.VillaNumbers.Any(u => u.Villa_number == obj.VNumber.Villa_number);
+
+
+            if (ModelState.IsValid && !roomNumberExists)
             {
-                ModelState.AddModelError("name", "The description cannot exactly match the Name.");
-            }
-            if (ModelState.IsValid)
-            {
-                _db.Villas.Add(obj);
+                _db.VillaNumbers.Add(obj.VNumber);
                 _db.SaveChanges();
-                TempData["success"] = "The villa has been created successfully.";
+                TempData["success"] = "The villa number has been created successfully.";
                 return RedirectToAction("Index");
             }
-            return View();
+            if (roomNumberExists)
+            {
+                TempData["error"] = "The villa Number already exists.";
+            }
+            obj.VillaList = _db.Villas.ToList().Select(u => new SelectListItem
+            {
+                Text = u.Name,
+                Value = u.Id.ToString(),
+
+            });
+            return View(obj);
         }
 
         [HttpGet]
@@ -56,7 +79,7 @@ namespace BookNest.Web.Controllers
         [HttpPost]
         public IActionResult Update(Villa obj)
         {
-            if (ModelState.IsValid && obj.Id>0)
+            if (ModelState.IsValid && obj.Id > 0)
             {
                 _db.Villas.Update(obj);
                 _db.SaveChanges();
