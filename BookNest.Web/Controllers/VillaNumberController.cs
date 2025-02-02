@@ -1,4 +1,5 @@
-﻿using BookNest.Domain.Entities;
+﻿using BookNest.Application.Common.Interfaces;
+using BookNest.Domain.Entities;
 using BookNest.Infrastructure.Data;
 using BookNest.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -9,14 +10,15 @@ namespace BookNest.Web.Controllers
 {
     public class VillaNumberController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public VillaNumberController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public VillaNumberController(IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            var villaNumbers = _db.VillaNumbers.Include(u=>u.Villa).ToList();
+            var villaNumbers = _unitOfWork.VillaNumber.GetAll(includeProperties: "Villa");
             return View(villaNumbers);
         }
 
@@ -25,7 +27,7 @@ namespace BookNest.Web.Controllers
         {
             VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _db.Villas.ToList().Select(u => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString(),
@@ -40,13 +42,13 @@ namespace BookNest.Web.Controllers
         {
             //ModelState.Remove("Villa");
 
-            bool roomNumberExists = _db.VillaNumbers.Any(u => u.Villa_number == obj.VNumber.Villa_number);
+            bool roomNumberExists = _unitOfWork.VillaNumber.Any(u => u.Villa_number == obj.VNumber.Villa_number);
 
 
             if (ModelState.IsValid && !roomNumberExists)
             {
-                _db.VillaNumbers.Add(obj.VNumber);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Add(obj.VNumber);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa number has been created successfully.";
                 return RedirectToAction(nameof(Index));
             }
@@ -54,7 +56,7 @@ namespace BookNest.Web.Controllers
             {
                 TempData["error"] = "The villa Number already exists.";
             }
-            obj.VillaList = _db.Villas.ToList().Select(u => new SelectListItem
+            obj.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString(),
@@ -68,13 +70,13 @@ namespace BookNest.Web.Controllers
         {
             VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _db.Villas.ToList().Select(u => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString(),
 
                 }),
-                VNumber = _db.VillaNumbers.FirstOrDefault(u=>u.Villa_number== villaNumberId)
+                VNumber = _unitOfWork.VillaNumber.Get(u => u.Villa_number == villaNumberId)
             };
             if (villaNumberVM.VNumber == null)
             {
@@ -89,12 +91,12 @@ namespace BookNest.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                _db.VillaNumbers.Update(villaNumberVM.VNumber);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Update(villaNumberVM.VNumber);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa number has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            villaNumberVM.VillaList = _db.Villas.ToList().Select(u => new SelectListItem
+            villaNumberVM.VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
             {
                 Text = u.Name,
                 Value = u.Id.ToString(),
@@ -108,13 +110,13 @@ namespace BookNest.Web.Controllers
         {
             VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _db.Villas.ToList().Select(u => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString(),
 
                 }),
-                VNumber = _db.VillaNumbers.FirstOrDefault(u => u.Villa_number == villaNumberId)
+                VNumber = _unitOfWork.VillaNumber.Get(u => u.Villa_number == villaNumberId)
             };
             if (villaNumberVM.VNumber == null)
             {
@@ -126,11 +128,11 @@ namespace BookNest.Web.Controllers
         [HttpPost]
         public IActionResult Delete(VillaNumberVM villaNumberVM)
         {
-            VillaNumber? objFromDb = _db.VillaNumbers.FirstOrDefault(d => d.Villa_number == villaNumberVM.VNumber.Villa_number);
+            VillaNumber? objFromDb = _unitOfWork.VillaNumber.Get(d => d.Villa_number == villaNumberVM.VNumber.Villa_number);
             if (objFromDb is not null)
             {
-                _db.VillaNumbers.Remove(objFromDb);
-                _db.SaveChanges();
+               _unitOfWork.VillaNumber.Remove(objFromDb);
+                _unitOfWork.Save();
                 TempData["success"] = "The villa number has been deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
