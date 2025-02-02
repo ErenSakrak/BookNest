@@ -123,6 +123,15 @@ namespace BookNest.Web.Controllers
             Villa? objFromDb = _unitOfWork.Villa.Get(d => d.Id == obj.Id);
             if (objFromDb is not null)
             {
+                if (!string.IsNullOrEmpty(objFromDb.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, objFromDb.ImageUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
                 _unitOfWork.Villa.Remove(objFromDb);
                 _unitOfWork.Save();
                 TempData["success"] = "The villa has been deleted successfully.";
