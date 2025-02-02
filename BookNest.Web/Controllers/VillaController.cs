@@ -1,4 +1,5 @@
-﻿using BookNest.Domain.Entities;
+﻿using BookNest.Application.Common.Interfaces;
+using BookNest.Domain.Entities;
 using BookNest.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,14 +7,14 @@ namespace BookNest.Web.Controllers
 {
     public class VillaController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public VillaController(ApplicationDbContext db)
+        private readonly IVillaRepository _villaRepo;
+        public VillaController(IVillaRepository villaRepo)
         {
-            _db = db;
+            _villaRepo = villaRepo;
         }
         public IActionResult Index()
         {
-            var villas = _db.Villas.ToList();
+            var villas = _villaRepo.GetAll();
             return View(villas);
         }
 
@@ -32,8 +33,8 @@ namespace BookNest.Web.Controllers
             }
             if (ModelState.IsValid)
             {
-                _db.Villas.Add(obj);
-                _db.SaveChanges();
+                _villaRepo.Add(obj);
+                _villaRepo.Save();
                 TempData["success"] = "The villa has been created successfully.";
                 return RedirectToAction(nameof(Index));
             }
@@ -43,7 +44,7 @@ namespace BookNest.Web.Controllers
         [HttpGet]
         public IActionResult Update(int villaId)
         {
-            Villa? obj = _db.Villas.FirstOrDefault(u => u.Id == villaId);
+            Villa? obj = _villaRepo.Get(u => u.Id == villaId);
             //Villa? obj = _db.Villas.Find(villaId);
             //var VillaList = _db.Villas.Where(u=>u.Price>50 && u.Occupancy>0);
             if (obj == null)
@@ -58,8 +59,8 @@ namespace BookNest.Web.Controllers
         {
             if (ModelState.IsValid && obj.Id>0)
             {
-                _db.Villas.Update(obj);
-                _db.SaveChanges();
+                _villaRepo.Update(obj);
+                _villaRepo.Save();
                 TempData["success"] = "The villa has been updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
@@ -69,7 +70,7 @@ namespace BookNest.Web.Controllers
         [HttpGet]
         public IActionResult Delete(int villaId)
         {
-            Villa? obj = _db.Villas.FirstOrDefault(d => d.Id == villaId);
+            Villa? obj = _villaRepo.Get(d => d.Id == villaId);
             if (obj is null)
             {
                 return RedirectToAction("Error","Home");
@@ -80,11 +81,11 @@ namespace BookNest.Web.Controllers
         [HttpPost]
         public IActionResult Delete(Villa obj)
         {
-            Villa? objFromDb = _db.Villas.FirstOrDefault(d => d.Id == obj.Id);
+            Villa? objFromDb = _villaRepo.Get(d => d.Id == obj.Id);
             if (objFromDb is not null)
             {
-                _db.Villas.Remove(objFromDb);
-                _db.SaveChanges();
+                _villaRepo.Remove(objFromDb);
+                _villaRepo.Save();
                 TempData["success"] = "The villa has been deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
