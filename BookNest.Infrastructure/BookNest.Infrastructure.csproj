@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BookNest.Application\BookNest.Application.csproj" />
     <ProjectReference Include="..\BookNest.Domain\BookNest.Domain.csproj" />
   </ItemGroup>
 
