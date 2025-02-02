@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,14 +20,17 @@ namespace BookNest.Domain.Entities
         public string? Description { get; set; }
 
         [Display(Name = "Price Per Night")]
-        [Range(10,10000)]
+        [Range(10, 10000)]
         public double Price { get; set; }
         public int Sqft { get; set; }
 
-        [Range(1,10)]
+        [Range(1, 10)]
         public int Occupancy { get; set; }
 
-        [Display(Name="Image Url")]
+        [NotMapped]
+        public IFormFile? Image { get; set; }
+
+        [Display(Name = "Image Url")]
         public string? ImageUrl { get; set; }
         public DateTime? Created_Date { get; set; }
         public DateTime? Updated_Date { get; set; }
