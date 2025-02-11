@@ -47,15 +47,15 @@ namespace BookNest.Infrastructure.Data
                     _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).Wait();
                     _userManager.CreateAsync(new ApplicationUser
                     {
-                        UserName = "admin@dotnetmastery.com",
-                        Email = "admin@dotnetmastery.com",
-                        Name = "Bhrugen Patel",
-                        NormalizedUserName = "ADMIN@DOTNETMASTERY.COM",
-                        NormalizedEmail = "ADMIN@DOTNETMASTERY.COM",
+                        UserName = "admin@eren.com",
+                        Email = "admin@eren.com",
+                        Name = "Eren ŞAKRAK",
+                        NormalizedUserName = "ADMIN@EREN.COM",
+                        NormalizedEmail = "ADMIN@EREN.COM",
                         PhoneNumber = "1112223333",
                     }, "Admin123*").GetAwaiter().GetResult();
 
-                    ApplicationUser user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "admin@dotnetmastery.com");
+                    ApplicationUser user = _db.ApplicationUsers.FirstOrDefault(u => u.Email == "admin@eren.com");
                     _userManager.AddToRoleAsync(user, SD.Role_Admin).GetAwaiter().GetResult();
                 }
             }

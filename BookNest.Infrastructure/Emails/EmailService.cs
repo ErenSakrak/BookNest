@@ -24,7 +24,7 @@ namespace BookNest.Infrastructure.Emails
         public async Task<bool> SendEmailAsync(string email, string subject, string message)
         {
             var client = new SendGridClient(_sendGridKey);
-            var from = new EmailAddress("hello@dotnetmastery.com", "DotNetMastery - White Lagoon");
+            var from = new EmailAddress("eren.sakrak900@gmail.com", "ErenSakrak - BookNest");
             var to = new EmailAddress(email);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, "", message);
             var response = await client.SendEmailAsync(msg);
