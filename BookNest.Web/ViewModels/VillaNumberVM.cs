@@ -7,7 +7,7 @@ namespace BookNest.Web.ViewModels
 {
     public class VillaNumberVM
     {
-        public VillaNumber? VillaNumber { get; set; }
+        public VillaNumber? VNumber { get; set; }
         [ValidateNever]
         public IEnumerable<SelectListItem>? VillaList { get; set; }
     }
