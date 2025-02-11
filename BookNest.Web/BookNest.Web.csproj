@@ -25,6 +25,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Views\Booking\" />
+		<Folder Include="Views\Dashboard\" />
 		<Folder Include="wwwroot\images\VillaImage\" />
 		<Folder Include="wwwroot\exports\" />
 	</ItemGroup>
