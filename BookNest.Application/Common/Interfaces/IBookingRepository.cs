@@ -1,5 +1,4 @@
 ﻿using BookNest.Application.Common.Interfaces;
-using BookNest.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +9,9 @@ using BookNest.Domain.Entities;
 
 namespace BookNest.Application.Common.Interfaces
 {
-    public interface IVillaRepository : IRepository<Villa>
+    public interface IBookingRepository : IRepository<Booking>
     {
-
-        void Update(Villa entity);
-
+        void Update(Booking entity);
 
     }
 }
